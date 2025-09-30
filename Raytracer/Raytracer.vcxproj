@@ -133,9 +133,11 @@
   <ItemGroup>
     <ClCompile Include="Drawing.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="Raytracer.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Drawing.hpp" />
+    <ClInclude Include="Raytracer.hpp" />
     <ClInclude Include="VecUtils.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

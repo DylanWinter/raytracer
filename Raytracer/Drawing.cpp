@@ -1,11 +1,12 @@
+#pragma once
 #include <SDL3/SDL.h>
 #include <iostream>
 
 #include "Drawing.hpp"
 
-namespace Raytracer 
+namespace Drawing 
 {
-	void DrawPixel(SDL_Renderer* Renderer, int x, int y, ivec4 Color) 
+	void DrawPixel(SDL_Renderer* Renderer, int x, int y, color4 Color) 
 	{
 		if (x > ResX) 
 		{
@@ -19,5 +20,13 @@ namespace Raytracer
 		}
 		SDL_SetRenderDrawColor(Renderer, Color.r, Color.g, Color.b, Color.a);
 		SDL_RenderPoint(Renderer, x, y);
+	}
+
+	vec3 CanvasToViewport(ivec2 CanvasPos) 
+	{
+		return vec3(
+			CanvasPos.x * (static_cast<float>(ViewportWidth) / ResX), 
+			-CanvasPos.y * (static_cast<float>(ViewportHeight) / ResY), 
+			ViewportDistanceFromCamera);
 	}
 }

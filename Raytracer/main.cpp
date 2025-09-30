@@ -1,46 +1,63 @@
+#pragma once
 #include <SDL3/SDL.h>
 #include <iostream>
 
 #include "Drawing.hpp"
+#include "Raytracer.hpp"
 
 int main(int argc, char* argv[]) {
+    // SDL Setup
     if (!SDL_Init(SDL_INIT_VIDEO)) {
         std::cerr << "SDL_Init Error: " << SDL_GetError() << "\n";
         return 1;
     }
-
     SDL_Window* Window = SDL_CreateWindow(
-        "Raytracer", Raytracer::ResX, Raytracer::ResY, SDL_WINDOW_RESIZABLE);
+        "Raytracer", Drawing::ResX, Drawing::ResY, SDL_WINDOW_RESIZABLE);
     if (!Window) {
         std::cerr << "SDL_CreateWindow Error: " << SDL_GetError() << "\n";
         SDL_Quit();
         return 1;
     }
-
     SDL_Renderer* Renderer = SDL_CreateRenderer(Window, nullptr);
     SDL_SetRenderDrawColor(Renderer, 0, 0, 0, 255);
 
-    bool running = true;
+    // Create scene
+    Scene Scene;
+    Sphere s1 = Sphere(vec3(0, -1, 4), 1, Colors::Red);
+    Scene.Spheres.push_back(s1);
+    Sphere s2 = Sphere(vec3(2, 0, 5), 1, Colors::Blue);
+    Scene.Spheres.push_back(s2);
+    Sphere s3 = Sphere(vec3(-2, 0, 5), 1, Colors::Green);
+    Scene.Spheres.push_back(s3);
+
+    // Main loop
+    bool Running = true;
     SDL_Event e;
-    while (running) {
+    while (Running) {
         while (SDL_PollEvent(&e)) {
             if (e.type == SDL_EVENT_QUIT)
-                running = false;
+                Running = false;
         }
 
         SDL_SetRenderDrawColor(Renderer, 0, 0, 0, 255);
         SDL_RenderClear(Renderer);
-
-        vec3 a{ 1, 2, 3 };
-        vec3 b{ 4, 5, 6 };
-        vec3 c = VecUtils::cross(a, b);
-        std::cout << c.x << " " << c.y << " " << c.z << "\n"; 
-
-        Raytracer::DrawPixel(Renderer, 4, 4, ivec4{ 255, 255, 255, 255 });
+        
+        // Rendering
+        for (int x = -Drawing::ResX / 2; x < Drawing::ResX / 2; x++) 
+        {
+            for (int y = -Drawing::ResY / 2; y < Drawing::ResY / 2; y++) 
+            {
+                Ray ray = Ray(Scene.Origin, Drawing::CanvasToViewport(ivec2(x, y)));
+                RayPayload Result = Raytracer::TraceRay(Scene, ray);
+               // std::cout << "Hit sphere at distance: " << Result.t << std::endl;
+                Drawing::DrawPixel(Renderer, x + Drawing::ResX / 2, y + Drawing::ResY / 2, Result.Color);
+            }
+        }
 
         SDL_RenderPresent(Renderer);
     }
 
+    // Clean up
     SDL_DestroyRenderer(Renderer);
     SDL_DestroyWindow(Window);
     SDL_Quit();

@@ -1,3 +1,4 @@
+#pragma once
 #include <string>
 #include <sstream>
 
@@ -8,6 +9,8 @@ template <typename T>
 struct vec<T, 2> {
     T x, y;
 
+    vec() : x(T{}), y(T{}) {}
+    vec(T x, T y) : x(x), y(y) {}
     T& operator[](size_t i) { return *(&x + i); }
     const T& operator[](size_t i) const { return *(&x + i); }
 };
@@ -15,6 +18,9 @@ struct vec<T, 2> {
 template <typename T>
 struct vec<T, 3> {
     T x, y, z;
+
+    vec() : x(T{}), y(T{}), z(T{}) {}
+    vec(T x, T y, T z) : x(x), y(y), z(z) {}
 
     T& operator[](size_t i) { return *(&x + i); }
     const T& operator[](size_t i) const { return *(&x + i); }
@@ -27,6 +33,9 @@ struct vec<T, 4> {
         struct { T r, g, b, a; };
     };
 
+    vec() : x(T{}), y(T{}), z(T{}), w(T{}) {}
+    vec(T x, T y, T z, T w) : x(x), y(y), z(z), w(w) {}
+
     T& operator[](size_t i) { return *(&x + i); }
     const T& operator[](size_t i) const { return *(&x + i); }
 };
@@ -37,6 +46,7 @@ using vec4 = vec<float, 4>;
 using ivec2 = vec<int, 2>;
 using ivec3 = vec<int, 3>;
 using ivec4 = vec<int, 4>;
+using color4 = ivec4;
 
 // Addition
 template <typename Vec>
@@ -191,6 +201,20 @@ namespace VecUtils
         for (size_t i = 0; i < sizeof(Vec) / sizeof(T); ++i)
             sum += a[i] * a[i];
         return sum;
+    }
+
+    // Distance
+    template <typename Vec>
+    float distance(const Vec& a, const Vec& b)
+    {
+        return length(a - b);
+    }
+
+    // Distance squared; useful to avoid expensive sqrt
+    template <typename Vec>
+    float distance2(const Vec& a, const Vec& b)
+    {
+        return length2(a - b);
     }
 
     // Normalize
