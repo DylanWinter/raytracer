@@ -1,6 +1,8 @@
 #pragma once
-#include <SDL3/SDL.h>
 #include <iostream>
+#include <chrono>
+
+#include <SDL3/SDL.h>
 
 #include "Drawing.hpp"
 #include "Raytracer.hpp"
@@ -41,6 +43,8 @@ int main(int argc, char* argv[]) {
 
         SDL_SetRenderDrawColor(Renderer, 0, 0, 0, 255);
         SDL_RenderClear(Renderer);
+
+        auto StartTime = std::chrono::high_resolution_clock::now();
         
         // Rendering
         for (int x = -Drawing::ResX / 2; x < Drawing::ResX / 2; x++) 
@@ -49,10 +53,13 @@ int main(int argc, char* argv[]) {
             {
                 Ray ray = Ray(Scene.Origin, Drawing::CanvasToViewport(ivec2(x, y)));
                 RayPayload Result = Raytracer::TraceRay(Scene, ray);
-               // std::cout << "Hit sphere at distance: " << Result.t << std::endl;
                 Drawing::DrawPixel(Renderer, x + Drawing::ResX / 2, y + Drawing::ResY / 2, Result.Color);
             }
         }
+
+        auto StopTime = std::chrono::high_resolution_clock::now();
+        auto Duration = std::chrono::duration_cast<std::chrono::milliseconds>(StopTime - StartTime);
+        std::cout << "Rendered in " << Duration.count() << " ms." << std::endl;
 
         SDL_RenderPresent(Renderer);
     }

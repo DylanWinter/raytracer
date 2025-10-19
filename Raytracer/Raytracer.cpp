@@ -5,6 +5,7 @@
 #include "Raytracer.hpp"
 
 namespace Raytracer {
+	// Traces a ray through the scene
 	RayPayload TraceRay(Scene& Scene, Ray Ray, float TMin, float TMax) 
 	{
 		float ClosestT = std::numeric_limits<float>::max();
@@ -30,6 +31,7 @@ namespace Raytracer {
 		return RayPayload(ClosestT, ClosestSphere->Color);
 	}
 
+	// Uses the quadratic equation to determine where a ray collides with a sphere
 	static std::pair<float, float> RayIntersectSphere(Ray& Ray, Sphere& s)
 	{
 		vec3 OriginToSphere = Ray.Origin - s.Origin;

@@ -12,10 +12,10 @@ struct Ray
 
 	Ray() = default;
 
-	Ray(const vec3& origin, const vec3& direction, float maxDistance = std::numeric_limits<float>::max())
-		: Origin(origin),
-		Direction(direction),
-		MaxDistance(maxDistance) {}
+	Ray(const vec3& Origin, const vec3& Direction, float MaxDistance = std::numeric_limits<float>::max())
+		: Origin(Origin),
+		Direction(VecUtils::normalize(Direction)),
+		MaxDistance(MaxDistance) {}
 };
 
 struct RayPayload
@@ -35,10 +35,10 @@ struct Sphere
 
 	Sphere() = default;
 
-	Sphere(const vec3& origin, float radius, const color4& color)
-		: Origin(origin),
-		Radius(radius),
-		Color(color) {}
+	Sphere(const vec3& Origin, float Radius, const color4& Color)
+		: Origin(Origin),
+		Radius(Radius),
+		Color(Color) {}
 };
 
 struct Scene

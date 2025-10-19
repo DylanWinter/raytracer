@@ -48,8 +48,18 @@ using ivec3 = vec<int, 3>;
 using ivec4 = vec<int, 4>;
 using color4 = ivec4;
 
+// Used to restrict to vector types
+template <typename>
+struct is_vec : std::false_type {};
+template <typename T, size_t N>
+struct is_vec<vec<T, N>> : std::true_type {};
+template <typename T>
+inline constexpr bool is_vec_v = is_vec<T>::value;
+template <typename T>
+concept VecType = is_vec_v<T>;
+
 // Addition
-template <typename Vec>
+template <VecType Vec>
 auto operator+(const Vec& a, const Vec& b) 
 {
     using T = decltype(a.x);
@@ -65,7 +75,7 @@ auto operator+(const Vec& a, const Vec& b)
 }
 
 // Subtraction
-template <typename Vec>
+template <VecType Vec>
 auto operator-(const Vec& a, const Vec& b)
 {
     using T = decltype(a.x);
@@ -81,7 +91,7 @@ auto operator-(const Vec& a, const Vec& b)
 }
 
 // Negation
-template <typename Vec>
+template <VecType Vec>
 auto operator-(const Vec& a)
 {
     using T = decltype(a.x);
@@ -92,7 +102,7 @@ auto operator-(const Vec& a)
 }
 
 // Equality
-template <typename Vec>
+template <VecType Vec>
 bool operator==(const Vec& a, const Vec& b)
 {
     using T = decltype(a.x);
@@ -107,14 +117,14 @@ bool operator==(const Vec& a, const Vec& b)
 }
 
 // Inequality
-template <typename Vec>
+template <VecType Vec>
 bool operator!=(const Vec& a, const Vec& b)
 {
     return !(a == b);
 }
 
 // Scalar multiplication
-template <typename Vec>
+template <VecType Vec>
 auto operator*(const Vec& a, const decltype(a.x)& s)
 {
     using T = decltype(a.x);
@@ -125,14 +135,14 @@ auto operator*(const Vec& a, const decltype(a.x)& s)
     return result;
 }
 // Commutative
-template <typename Vec>
+template <VecType Vec>
 auto operator*(const decltype(std::declval<Vec>().x)& s, const Vec& v)
 {
     return v * s; 
 }
 
 // Scalar division
-template <typename Vec>
+template <VecType Vec>
 auto operator/(const Vec& a, const decltype(a.x)& s)
 {
     using T = decltype(a.x);
@@ -143,7 +153,7 @@ auto operator/(const Vec& a, const decltype(a.x)& s)
 }
 
 // Add assign
-template <typename Vec>
+template <VecType Vec>
 Vec& operator+=(Vec& a, const Vec& b)
 {
     for (size_t i = 0; i < sizeof(Vec) / sizeof(decltype(a.x)); ++i)
@@ -152,7 +162,7 @@ Vec& operator+=(Vec& a, const Vec& b)
 }
 
 // Sub assign
-template <typename Vec>
+template <VecType Vec>
 Vec& operator-=(Vec& a, const Vec& b)
 {
     for (size_t i = 0; i < sizeof(Vec) / sizeof(decltype(a.x)); ++i)
@@ -161,7 +171,7 @@ Vec& operator-=(Vec& a, const Vec& b)
 }
 
 // Multiply assign
-template <typename Vec>
+template <VecType Vec>
 Vec& operator*=(Vec& a, const decltype(a.x)& s)
 {
     for (size_t i = 0; i < sizeof(Vec) / sizeof(decltype(a.x)); ++i)
@@ -170,7 +180,7 @@ Vec& operator*=(Vec& a, const decltype(a.x)& s)
 }
 
 // Divide assign
-template <typename Vec>
+template <VecType Vec>
 Vec& operator/=(Vec& a, const decltype(a.x)& s)
 {
     for (size_t i = 0; i < sizeof(Vec) / sizeof(decltype(a.x)); ++i)
@@ -181,7 +191,7 @@ Vec& operator/=(Vec& a, const decltype(a.x)& s)
 namespace VecUtils 
 {
     // Length
-    template <typename Vec>
+    template <VecType Vec>
     auto length(const Vec& a) 
     {
         using T = decltype(a.x);
@@ -193,7 +203,7 @@ namespace VecUtils
     }
 
     // Length squared
-    template <typename Vec>
+    template <VecType Vec>
     auto length2(const Vec& a)
     {
         using T = decltype(a.x);
@@ -204,21 +214,21 @@ namespace VecUtils
     }
 
     // Distance
-    template <typename Vec>
+    template <VecType Vec>
     float distance(const Vec& a, const Vec& b)
     {
         return length(a - b);
     }
 
     // Distance squared; useful to avoid expensive sqrt
-    template <typename Vec>
+    template <VecType Vec>
     float distance2(const Vec& a, const Vec& b)
     {
         return length2(a - b);
     }
 
     // Normalize
-    template <typename Vec>
+    template <VecType Vec>
     Vec normalize(const Vec& a)
     {
         auto len = VecUtils::length(a);
@@ -227,7 +237,7 @@ namespace VecUtils
     }
 
     // Dot product
-    template <typename Vec>
+    template <VecType Vec>
     auto dot(const Vec& a, const Vec& b) {
         using T = decltype(a.x);
 
@@ -242,7 +252,7 @@ namespace VecUtils
     }
 
     // Cross product
-    template <typename T>
+    template <VecType T>
     vec<T, 3> cross(const vec<T, 3>& a, const vec<T, 3>& b)
     {
         return vec<T, 3>{
