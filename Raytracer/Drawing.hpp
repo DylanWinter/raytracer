@@ -3,19 +3,20 @@
 #include "VecUtils.hpp"
 
 namespace Colors {
-    inline const color4 White = { 255, 255, 255, 255 };
-    inline const color4 Black = { 0,   0,   0,   255 };
-    inline const color4 Red = { 255, 0,   0,   255 };
-    inline const color4 Green = { 0,   255, 0,   255 };
-    inline const color4 Blue = { 0,   0,   255, 255 };
-    inline const color4 Yellow = { 255, 255, 0,   255 };
-    inline const color4 Cyan = { 0,   255, 255, 255 };
-    inline const color4 Magenta = { 255, 0,   255, 255 };
-    inline const color4 Gray = { 128, 128, 128, 255 };
-    inline const color4 Orange = { 255, 165, 0,   255 };
-    inline const color4 Purple = { 128, 0,   128, 255 };
-    inline const color4 Brown = { 165, 42,  42,  255 };
+    inline const vec4 White = { 1.0f, 1.0f, 1.0f, 1.0f };
+    inline const vec4 Black = { 0.0f, 0.0f, 0.0f, 1.0f };
+    inline const vec4 Red = { 1.0f, 0.0f, 0.0f, 1.0f };
+    inline const vec4 Green = { 0.0f, 1.0f, 0.0f, 1.0f };
+    inline const vec4 Blue = { 0.0f, 0.0f, 1.0f, 1.0f };
+    inline const vec4 Yellow = { 1.0f, 1.0f, 0.0f, 1.0f };
+    inline const vec4 Cyan = { 0.0f, 1.0f, 1.0f, 1.0f };
+    inline const vec4 Magenta = { 1.0f, 0.0f, 1.0f, 1.0f };
+    inline const vec4 Gray = { 0.502f, 0.502f, 0.502f, 1.0f }; 
+    inline const vec4 Orange = { 1.0f, 0.647f, 0.0f, 1.0f };     
+    inline const vec4 Purple = { 0.502f, 0.0f, 0.502f, 1.0f };  
+    inline const vec4 Brown = { 0.647f, 0.165f, 0.165f, 1.0f }; 
 }
+
 
 namespace Drawing 
 {

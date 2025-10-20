@@ -4,6 +4,35 @@
 #include "VecUtils.hpp"
 #include "Raytracer.hpp"
 
+namespace {
+	// Computes the intensity of light at a given point
+	// Expects the normal to already be normalized
+	float ComputeLighting(Scene& Scene, vec3 Point, vec3 Normal)
+	{
+		float Intensity = 0.0f;
+		for (const Light& l : Scene.Lights)
+		{
+			// Ambient light is a simple add
+			if (l.Type == LightType::Ambient)
+			{
+				Intensity += l.Intensity;
+			}
+			else
+			{
+				// Direction depends on what kind of light; Point lights must be computed, Directional is already known
+				vec3 Direction = l.Type == LightType::Point ? (l.Position - Point) : l.Direction;
+				Direction = VecUtils::normalize(Direction);
+				float NormalDotDirection = VecUtils::dot(Normal, Direction);
+				if (NormalDotDirection > 0)
+					Intensity += l.Intensity * NormalDotDirection;
+			}
+		}
+		
+		// Scale intensity values into [0, 1] range
+		return Intensity / (Intensity + 1.0f);
+	}
+}
+
 namespace Raytracer {
 	// Traces a ray through the scene
 	RayPayload TraceRay(Scene& Scene, Ray Ray, float TMin, float TMax) 
@@ -28,7 +57,10 @@ namespace Raytracer {
 
 		if (!ClosestSphere)
 			return RayPayload(ClosestT, Scene.BackgroundColor);
-		return RayPayload(ClosestT, ClosestSphere->Color);
+		
+		const vec3 Point = Ray.Origin + (ClosestT * Ray.Direction);
+		const vec3 Normal = VecUtils::normalize(Point - ClosestSphere->Origin);
+		return RayPayload(ClosestT, ClosestSphere->Color * ComputeLighting(Scene, Point, Normal));
 	}
 
 	// Uses the quadratic equation to determine where a ray collides with a sphere

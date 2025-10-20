@@ -46,7 +46,7 @@ using vec4 = vec<float, 4>;
 using ivec2 = vec<int, 2>;
 using ivec3 = vec<int, 3>;
 using ivec4 = vec<int, 4>;
-using color4 = ivec4;
+using color4 = vec4;
 
 // Used to restrict to vector types
 template <typename>
