@@ -1,13 +1,14 @@
 #pragma once
 #include <optional>
+#include <iostream>
 
 #include "VecUtils.hpp"
 #include "Raytracer.hpp"
 
 namespace {
 	// Computes the intensity of light at a given point
-	// Expects the normal to already be normalized
-	float ComputeLighting(Scene& Scene, vec3 Point, vec3 Normal)
+	// Expects the normal and view direction to already be normalized
+	float ComputeLighting(Scene& Scene, vec3 Point, vec3 Normal, vec3 ViewDirection, std::optional<float> Specular)
 	{
 		float Intensity = 0.0f;
 		for (const Light& l : Scene.Lights)
@@ -22,14 +23,26 @@ namespace {
 				// Direction depends on what kind of light; Point lights must be computed, Directional is already known
 				vec3 Direction = l.Type == LightType::Point ? (l.Position - Point) : l.Direction;
 				Direction = VecUtils::normalize(Direction);
+
+				// Diffuse
 				float NormalDotDirection = VecUtils::dot(Normal, Direction);
 				if (NormalDotDirection > 0)
 					Intensity += l.Intensity * NormalDotDirection;
+
+				// Specular
+				if (Specular.has_value())
+				{
+					const vec3 Reflected = VecUtils::normalize(2 * Normal * NormalDotDirection - Direction);
+					const float ReflectedDotView = VecUtils::dot(Reflected, ViewDirection);
+					if (ReflectedDotView > 0)
+					{
+						Intensity += l.Intensity * 50.0f * std::pow(ReflectedDotView, Specular.value());
+					}
+				}
 			}
 		}
 		
-		// Scale intensity values into [0, 1] range
-		return Intensity / (Intensity + 1.0f);
+		return Intensity;
 	}
 }
 
@@ -60,7 +73,7 @@ namespace Raytracer {
 		
 		const vec3 Point = Ray.Origin + (ClosestT * Ray.Direction);
 		const vec3 Normal = VecUtils::normalize(Point - ClosestSphere->Origin);
-		return RayPayload(ClosestT, ClosestSphere->Color * ComputeLighting(Scene, Point, Normal));
+		return RayPayload(ClosestT, ClosestSphere->Color * ComputeLighting(Scene, Point, Normal, -Ray.Direction, ClosestSphere->Specular));
 	}
 
 	// Uses the quadratic equation to determine where a ray collides with a sphere

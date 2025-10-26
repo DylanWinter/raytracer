@@ -18,7 +18,12 @@ namespace Drawing
 			std::cout << "DrawPixel given invalid y coordinate: " << y << std::endl;
 			return;
 		}
-		SDL_SetRenderDrawColor(Renderer, Color.r * 255, Color.g * 255, Color.b * 255, Color.a * 255);
+		
+		auto Remap = [](float Value)
+		{
+			return Value / (Value + 1.0f);
+		};
+		SDL_SetRenderDrawColor(Renderer, Remap(Color.r) * 255, Remap(Color.g) * 255, Remap(Color.b) * 255, Color.a * 255);
 		SDL_RenderPoint(Renderer, x, y);
 	}
 

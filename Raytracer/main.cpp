@@ -25,11 +25,12 @@ int main(int argc, char* argv[]) {
 
     // Create scene
     Scene Scene;
-    Scene.AddSphere(vec3(0, -1, 4), 1, Colors::Red);
-    Scene.AddSphere(vec3(2, 0, 5), 1, Colors::Blue);
-    Scene.AddSphere(vec3(-2, 0, 5), 1, Colors::Green);
-    Scene.AddAmbientLight(0.3f);
-    Scene.AddPointLight(2.5f);
+    Scene.AddSphere(vec3(0, -1, 4), 1, Colors::Red, 100);
+    Scene.AddSphere(vec3(2, 0, 5), 1, Colors::Blue, 1000);
+    Scene.AddSphere(vec3(-2, 0, 5), 1, Colors::Green, 10);
+    Scene.AddSphere(vec3(0, -1001, 0), 1000, Colors::Yellow, 10);
+    Scene.AddAmbientLight(0.2f);
+    Scene.AddPointLight(2.5f, vec3(2, 1, 0));
 
     // Main loop
     bool Running = true;

@@ -40,12 +40,17 @@ struct Sphere
 	float Radius = 1.0f;
 	color4 Color = Colors::Magenta;
 
+	std::optional<float> Specular = std::nullopt;
+
 	Sphere() = default;
 
-	Sphere(const vec3& Origin, float Radius, const color4& Color)
+	// If the given value of Specular is negative, Specular will be std::nullopt
+	Sphere(const vec3& Origin = VEC3_ZERO, float Radius = 1.0f, const color4& Color = Colors::Red, float Specular = -1.0f)
 		: Origin(Origin),
 		Radius(Radius),
-		Color(Color) {}
+		Color(Color),
+		Specular(Specular < 0.0f ? std::nullopt : std::optional<float>(Specular))
+	{}
 };
 
 struct Light
@@ -72,9 +77,9 @@ struct Scene
 	std::vector<Sphere> Spheres{};
 	std::vector<Light> Lights{};
 
-	Sphere AddSphere(const vec3& Origin = vec3(0.0f, 0.0f, 0.0f), float Radius = 1.0f, const color4& Color = Colors::Red)
+	Sphere AddSphere(const vec3& Origin = vec3(0.0f, 0.0f, 0.0f), float Radius = 1.0f, const color4& Color = Colors::Red, float Specular = -1.0f)
 	{
-		return Spheres.emplace_back(Origin, Radius, Color);
+		return Spheres.emplace_back(Origin, Radius, Color, Specular);
 	}
 
 	Light AddLight(LightType Type, float Intensity = 1.0f, const vec3& Position = vec3(0.0f, 0.0f, 0.0f), const vec3& Direction = vec3(1.0f, 0.0f, 0.0f))

@@ -9,8 +9,9 @@ template <typename T>
 struct vec<T, 2> {
     T x, y;
 
-    vec() : x(T{}), y(T{}) {}
-    vec(T x, T y) : x(x), y(y) {}
+    constexpr vec() : x(T{}), y(T{}) {}
+    constexpr vec(T x, T y) : x(x), y(y) {}
+
     T& operator[](size_t i) { return *(&x + i); }
     const T& operator[](size_t i) const { return *(&x + i); }
 };
@@ -19,8 +20,8 @@ template <typename T>
 struct vec<T, 3> {
     T x, y, z;
 
-    vec() : x(T{}), y(T{}), z(T{}) {}
-    vec(T x, T y, T z) : x(x), y(y), z(z) {}
+    constexpr vec() : x(T{}), y(T{}), z(T{}) {}
+    constexpr vec(T x, T y, T z) : x(x), y(y), z(z) {}
 
     T& operator[](size_t i) { return *(&x + i); }
     const T& operator[](size_t i) const { return *(&x + i); }
@@ -33,8 +34,8 @@ struct vec<T, 4> {
         struct { T r, g, b, a; };
     };
 
-    vec() : x(T{}), y(T{}), z(T{}), w(T{}) {}
-    vec(T x, T y, T z, T w) : x(x), y(y), z(z), w(w) {}
+    constexpr vec() : x(T{}), y(T{}), z(T{}), w(T{}) {}
+    constexpr vec(T x, T y, T z, T w) : x(x), y(y), z(z), w(w) {}
 
     T& operator[](size_t i) { return *(&x + i); }
     const T& operator[](size_t i) const { return *(&x + i); }
@@ -47,6 +48,10 @@ using ivec2 = vec<int, 2>;
 using ivec3 = vec<int, 3>;
 using ivec4 = vec<int, 4>;
 using color4 = vec4;
+
+constexpr vec2 VEC2_ZERO = vec2{ 0, 0 };
+constexpr vec3 VEC3_ZERO = vec3{ 0, 0, 0 };
+constexpr vec4 VEC4_ZERO = vec4{ 0, 0, 0, 0 };
 
 // Used to restrict to vector types
 template <typename>
