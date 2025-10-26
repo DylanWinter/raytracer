@@ -104,7 +104,5 @@ struct Scene
 };
 
 namespace Raytracer {
-	RayPayload TraceRay(Scene& Scene, Ray Ray, float TMin = 1.0, float TMax = std::numeric_limits<float>::max());
-
-	static std::pair<float, float> RayIntersectSphere(Ray& Ray, Sphere& s);
+	RayPayload TraceRay(Scene& Scene, Ray Ray, float TMin = 1e-6, float TMax = std::numeric_limits<float>::max());
 }
