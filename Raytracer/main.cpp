@@ -25,10 +25,10 @@ int main(int argc, char* argv[]) {
 
     // Create scene
     Scene Scene;
-    Scene.AddSphere(vec3(0, -1, 4), 1, Colors::Red, 100);
-    Scene.AddSphere(vec3(2, 0, 5), 1, Colors::Blue, 1000);
-    Scene.AddSphere(vec3(-2, 0, 5), 1, Colors::Green, 10);
-    Scene.AddSphere(vec3(0, -1001, 0), 1000, Colors::Yellow, 10);
+    Scene.AddSphere(vec3(0, -1, 4), 1, Colors::Red, 100, 0.1f);
+    Scene.AddSphere(vec3(2, 0, 5), 1, Colors::Blue, 1000, 0.5f);
+    Scene.AddSphere(vec3(-2, 0, 5), 1, Colors::Green, 10, 0.2f);
+    Scene.AddSphere(vec3(0, -1001, 0), 1000, Colors::Yellow, 10, 0.1f);
     Scene.AddAmbientLight(0.2f);
     Scene.AddPointLight(2.5f, vec3(2, 1, 0));
 
@@ -47,12 +47,13 @@ int main(int argc, char* argv[]) {
         auto StartTime = std::chrono::high_resolution_clock::now();
         
         // Rendering
+        #pragma omp for
         for (int x = -Drawing::ResX / 2; x < Drawing::ResX / 2; x++) 
         {
             for (int y = -Drawing::ResY / 2; y < Drawing::ResY / 2; y++) 
             {
-                Ray ray = Ray(Scene.Origin, Drawing::CanvasToViewport(ivec2(x, y)));
-                RayPayload Result = Raytracer::TraceRay(Scene, ray);
+                Ray R = Ray(Scene.Origin, Drawing::CanvasToViewport(ivec2(x, y)));
+                RayPayload Result = Raytracer::TraceRay(Scene, R);
                 Drawing::DrawPixel(Renderer, x + Drawing::ResX / 2, y + Drawing::ResY / 2, Result.Color);
             }
         }

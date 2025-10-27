@@ -6,6 +6,13 @@
 #include "Raytracer.hpp"
 
 namespace {
+	// Reflects ray direction over the normal and returns a new direction, normalized
+	// Expects both ray direction and normal as unit vectors
+	vec3 Reflect(vec3 RayDirection, vec3 Normal)
+	{
+		return VecUtils::normalize(2 * Normal * VecUtils::dot(RayDirection, Normal) - RayDirection);
+	}
+
 	// Uses the quadratic equation to determine where a ray collides with a sphere
 	static std::pair<float, float> RayIntersectSphere(Ray& Ray, Sphere& s)
 	{
@@ -47,7 +54,7 @@ namespace {
 	}
 
 	// Computes the intensity of light at a given point
-	// Expects the normal and view direction to already be normalized
+	// Expects the normal and view direction as unit vectors
 	float ComputeLighting(Scene& Scene, vec3 Point, vec3 Normal, vec3 ViewDirection, std::optional<float> Specular)
 	{
 		float Intensity = 0.0f;
@@ -79,7 +86,7 @@ namespace {
 				// Specular
 				if (Specular.has_value())
 				{
-					const vec3 Reflected = VecUtils::normalize(2 * Normal * NormalDotDirection - Direction);
+					const vec3 Reflected = Reflect(Direction, Normal);
 					const float ReflectedDotView = VecUtils::dot(Reflected, ViewDirection);
 					if (ReflectedDotView > 0)
 					{
@@ -95,15 +102,25 @@ namespace {
 
 namespace Raytracer {
 	// Traces a ray through the scene
-	RayPayload TraceRay(Scene& Scene, Ray Ray, float TMin, float TMax) 
+	RayPayload TraceRay(Scene& Scene, Ray R, float TMin, float TMax, int RecursionDepth) 
 	{
-		auto [ClosestT, ClosestSphere] = ClosestIntersection(Scene, Ray, TMin, TMax);
-
+		auto [ClosestT, ClosestSphere] = ClosestIntersection(Scene, R, TMin, TMax);
 		if (!ClosestSphere)
 			return RayPayload(ClosestT, Scene.BackgroundColor);
 		
-		const vec3 Point = Ray.Origin + (ClosestT * Ray.Direction);
+		// Compute local color
+		const vec3 Point = R.Origin + (ClosestT * R.Direction);
 		const vec3 Normal = VecUtils::normalize(Point - ClosestSphere->Origin);
-		return RayPayload(ClosestT, ClosestSphere->Color * ComputeLighting(Scene, Point, Normal, -Ray.Direction, ClosestSphere->Specular));
+		color4 LocalColor = ClosestSphere->Color * ComputeLighting(Scene, Point, Normal, -R.Direction, ClosestSphere->Specular);
+
+		// Check if we should reflect; return if not
+		if (RecursionDepth <= 0 || ClosestSphere->Reflective <= 0.0f)
+			return RayPayload(ClosestT, LocalColor);
+
+		// Recursively compute reflection
+		Ray Reflected = Ray(Point + Normal * 1e-4f, Reflect(-R.Direction, Normal));
+		color4 ReflectedColor = TraceRay(Scene, Reflected, 1e-6, std::numeric_limits<float>::max(), RecursionDepth - 1).Color;
+
+		return RayPayload(ClosestT, LocalColor * (1 - ClosestSphere->Reflective) + ReflectedColor * ClosestSphere->Reflective);
 	}
 }

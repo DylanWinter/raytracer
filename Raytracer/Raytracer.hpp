@@ -40,16 +40,18 @@ struct Sphere
 	float Radius = 1.0f;
 	color4 Color = Colors::Magenta;
 
+	float Reflective = 0.0f;
 	std::optional<float> Specular = std::nullopt;
 
 	Sphere() = default;
 
 	// If the given value of Specular is negative, Specular will be std::nullopt
-	Sphere(const vec3& Origin = VEC3_ZERO, float Radius = 1.0f, const color4& Color = Colors::Red, float Specular = -1.0f)
+	Sphere(const vec3& Origin = VEC3_ZERO, float Radius = 1.0f, const color4& Color = Colors::Red, float Specular = -1.0f, float Reflective = 0.0f)
 		: Origin(Origin),
 		Radius(Radius),
 		Color(Color),
-		Specular(Specular < 0.0f ? std::nullopt : std::optional<float>(Specular))
+		Specular(Specular < 0.0f ? std::nullopt : std::optional<float>(Specular)),
+		Reflective(Reflective)
 	{}
 };
 
@@ -77,9 +79,9 @@ struct Scene
 	std::vector<Sphere> Spheres{};
 	std::vector<Light> Lights{};
 
-	Sphere AddSphere(const vec3& Origin = vec3(0.0f, 0.0f, 0.0f), float Radius = 1.0f, const color4& Color = Colors::Red, float Specular = -1.0f)
+	Sphere AddSphere(const vec3& Origin = vec3(0.0f, 0.0f, 0.0f), float Radius = 1.0f, const color4& Color = Colors::Red, float Specular = -1.0f, float Reflective = 0.0f)
 	{
-		return Spheres.emplace_back(Origin, Radius, Color, Specular);
+		return Spheres.emplace_back(Origin, Radius, Color, Specular, Reflective);
 	}
 
 	Light AddLight(LightType Type, float Intensity = 1.0f, const vec3& Position = vec3(0.0f, 0.0f, 0.0f), const vec3& Direction = vec3(1.0f, 0.0f, 0.0f))
@@ -104,5 +106,7 @@ struct Scene
 };
 
 namespace Raytracer {
-	RayPayload TraceRay(Scene& Scene, Ray Ray, float TMin = 1e-6, float TMax = std::numeric_limits<float>::max());
+	constexpr int MAX_RECURSION_DEPTH = 3;
+
+	RayPayload TraceRay(Scene& Scene, Ray Ray, float TMin = 1e-6, float TMax = std::numeric_limits<float>::max(), int RecursionDepth = MAX_RECURSION_DEPTH);
 }
